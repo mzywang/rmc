@@ -29,14 +29,29 @@ done
 total=0
 failures=0
 
+TIMEFORMAT='%R'
+
 for test_file in tests/*_test.sh; do
-    name="$(basename "$test_file" _test.sh)"
+    name="$(basename "$test_file")"
 
     total=$((total + 1))
-    if output="$("$test_file" 2>&1)"; then
-        echo "[PASS] $name"
+
+    time_file="$(mktemp)"
+    set +e
+    {
+        time {
+            output="$("$test_file" 2>&1)"
+            rc=$?
+        }
+    } 2>"$time_file"
+    set -e
+    elapsed="$(cat "$time_file")"
+    rm -f "$time_file"
+
+    if [[ "$rc" -eq 0 ]]; then
+        echo "[PASS] $name (${elapsed}s)"
     else
-        echo "[FAIL] $name: $output"
+        echo "[FAIL] $name (${elapsed}s): $output"
         failures=$((failures + 1))
     fi
 done
