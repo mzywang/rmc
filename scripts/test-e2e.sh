@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 BIN="zig-out/bin/rmc"
-PORT="$(grep -E '^port:' config.yaml | awk '{print $2}')"
+export PORT="$(grep -E '^port:' config.yaml | awk '{print $2}')"
 
 "$BIN" &
 SERVER_PID=$!
@@ -22,19 +22,25 @@ for _ in $(seq 1 50); do
     sleep 0.1
 done
 
-BODY_FILE="$(mktemp)"
-STATUS="$(curl -s -o "$BODY_FILE" -w '%{http_code}' "http://localhost:${PORT}/hello")"
-BODY="$(cat "$BODY_FILE")"
-rm -f "$BODY_FILE"
+total=0
+failures=0
 
-if [[ "$STATUS" != "200" ]]; then
-    echo "expected status 200, got $STATUS"
+for test_file in scripts/e2e/*.sh; do
+    name="$(basename "$test_file" .sh)"
+    [[ "$name" == "lib" ]] && continue
+
+    total=$((total + 1))
+    if output="$("$test_file" 2>&1)"; then
+        echo "[PASS] $name"
+    else
+        echo "[FAIL] $name: $output"
+        failures=$((failures + 1))
+    fi
+done
+
+echo
+echo "$((total - failures))/$total tests passed"
+
+if [[ "$failures" -gt 0 ]]; then
     exit 1
 fi
-
-if [[ "$BODY" != "Hello, world!" ]]; then
-    echo "expected body 'Hello, world!', got '$BODY'"
-    exit 1
-fi
-
-echo "e2e test passed"
