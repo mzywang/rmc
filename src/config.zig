@@ -2,6 +2,7 @@ const std = @import("std");
 
 pub const Config = struct {
     port: u16,
+    debug: bool = false,
 };
 
 pub fn load(dir: std.Io.Dir, io: std.Io, gpa: std.mem.Allocator, path: []const u8) !Config {
@@ -9,6 +10,7 @@ pub fn load(dir: std.Io.Dir, io: std.Io, gpa: std.mem.Allocator, path: []const u
     defer gpa.free(contents);
 
     var port: ?u16 = null;
+    var debug: bool = false;
     var lines = std.mem.splitScalar(u8, contents, '\n');
     while (lines.next()) |raw_line| {
         const line = std.mem.trim(u8, raw_line, " \t\r");
@@ -20,8 +22,16 @@ pub fn load(dir: std.Io.Dir, io: std.Io, gpa: std.mem.Allocator, path: []const u
 
         if (std.mem.eql(u8, key, "port")) {
             port = try std.fmt.parseInt(u16, value, 10);
+        } else if (std.mem.eql(u8, key, "debug")) {
+            if (std.mem.eql(u8, value, "true")) {
+                debug = true;
+            } else if (std.mem.eql(u8, value, "false")) {
+                debug = false;
+            } else {
+                return error.InvalidDebugValue;
+            }
         }
     }
 
-    return .{ .port = port orelse return error.MissingPort };
+    return .{ .port = port orelse return error.MissingPort, .debug = debug };
 }
