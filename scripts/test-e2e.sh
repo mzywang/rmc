@@ -25,9 +25,8 @@ done
 total=0
 failures=0
 
-for test_file in scripts/e2e/*.sh; do
-    name="$(basename "$test_file" .sh)"
-    [[ "$name" == "lib" ]] && continue
+for test_file in scripts/e2e/*_test.sh; do
+    name="$(basename "$test_file" _test.sh)"
 
     total=$((total + 1))
     if output="$("$test_file" 2>&1)"; then
