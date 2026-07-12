@@ -20,7 +20,7 @@ pub fn main(init: std.process.Init) !void {
         server.deinit();
     }
 
-    const request_logger = try server.middleware(RequestLogger, .{});
+    const request_logger = try server.middleware(RequestLogger, .{ .enabled = cfg.debug });
 
     var router = try server.router(.{ .middlewares = &.{request_logger} });
     router.get("/hello", hello, .{});
