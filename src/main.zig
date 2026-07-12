@@ -5,8 +5,12 @@ const RequestLogger = @import("request_logger.zig");
 
 pub fn main(init: std.process.Init) !void {
     const allocator = init.gpa;
+    const arena = init.arena.allocator();
 
-    const cfg = try config.load(.cwd(), init.io, allocator, "config.yaml");
+    const args = try init.minimal.args.toSlice(arena);
+    const config_path = try parseConfigPath(args);
+
+    const cfg = try config.load(.cwd(), init.io, allocator, config_path);
 
     var server = try httpz.Server(void).init(init.io, allocator, .{
         .address = .localhost(cfg.port),
@@ -28,4 +32,20 @@ pub fn main(init: std.process.Init) !void {
 fn hello(_: *httpz.Request, res: *httpz.Response) !void {
     res.status = 200;
     res.body = "Hello, world!";
+}
+
+fn parseConfigPath(args: []const []const u8) ![]const u8 {
+    var i: usize = 1;
+    while (i < args.len) : (i += 1) {
+        const arg = args[i];
+        if (std.mem.eql(u8, arg, "--config")) {
+            i += 1;
+            if (i >= args.len) return error.MissingConfigValue;
+            return args[i];
+        }
+        if (std.mem.startsWith(u8, arg, "--config=")) {
+            return arg["--config=".len..];
+        }
+    }
+    return "config.yaml";
 }
