@@ -1,0 +1,19 @@
+.{
+    .name = .rmc,
+    .version = "0.0.0",
+    .fingerprint = 0xacdc4024adc6df8f,
+    .minimum_zig_version = "0.16.0",
+    .dependencies = .{
+        .httpz = .{
+            .url = "git+https://github.com/karlseguin/http.zig#01dc09453ae50b82cc74ac2f90e9cd57e0b38500",
+            .hash = "httpz-0.0.0-PNVzrEnoCAAwAtnht2430lpr-ynyNpLeTpoy_-lmWyhD",
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+        "LICENSE",
+        "README.md",
+    },
+}
