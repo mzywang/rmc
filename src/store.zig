@@ -1,4 +1,13 @@
 const std = @import("std");
+const config = @import("config.zig");
+const MemoryStore = @import("memory_store.zig").MemoryStore;
+
+pub fn open(allocator: std.mem.Allocator, cfg: config.Config) !Store {
+    _ = cfg;
+    const memory_store = try allocator.create(MemoryStore);
+    memory_store.* = MemoryStore.init(allocator);
+    return memory_store.store();
+}
 
 pub const Store = struct {
     ptr: *anyopaque,

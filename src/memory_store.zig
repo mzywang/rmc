@@ -79,7 +79,6 @@ pub const MemoryStore = struct {
     fn close(ptr: *anyopaque) void {
         const self: *MemoryStore = @ptrCast(@alignCast(ptr));
         self.mutex.lock();
-        defer self.mutex.unlock();
 
         var it = self.entries.iterator();
         while (it.next()) |entry| {
@@ -87,5 +86,9 @@ pub const MemoryStore = struct {
             self.allocator.free(entry.value_ptr.*);
         }
         self.entries.deinit(self.allocator);
+
+        const allocator = self.allocator;
+        self.mutex.unlock();
+        allocator.destroy(self);
     }
 };
