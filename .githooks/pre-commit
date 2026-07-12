@@ -12,6 +12,6 @@ fi
 
 if ! zig fmt --check "${files[@]}"; then
     echo
-    echo "Formatting check failed. Run 'zig fmt <file>' to fix, then re-stage and commit."
+    echo "Formatting check failed. Run 'zig build fmt' to fix, then re-stage and commit."
     exit 1
 fi

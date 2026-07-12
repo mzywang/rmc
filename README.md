@@ -50,4 +50,8 @@ To add a test case, drop a new executable `*_test.sh` script in `tests/` (see `s
 
 ## Formatting
 
-CI checks `zig fmt --check` on every PR. Running `zig build` (in any form — `run`, `e2e`, or plain) automatically enables the repo's git hooks (`git config core.hooksPath .githooks`), which blocks commits that would fail the formatting check.
+```bash
+zig build fmt
+```
+
+Formats `build.zig`, `build.zig.zon`, and `src/` in place. CI checks `zig fmt --check` on every PR, and running `zig build` (in any form — `run`, `e2e`, or plain) automatically enables the repo's git hooks (`git config core.hooksPath .githooks`), which blocks commits that would fail the formatting check — both point you at `zig build fmt` if they fail.

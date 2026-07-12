@@ -40,4 +40,9 @@ pub fn build(b: *std.Build) void {
 
     const e2e_step = b.step("e2e", "Run the black-box end-to-end test");
     e2e_step.dependOn(&e2e_cmd.step);
+
+    const fmt_cmd = b.addSystemCommand(&.{ "zig", "fmt", "build.zig", "build.zig.zon", "src" });
+
+    const fmt_step = b.step("fmt", "Format source files");
+    fmt_step.dependOn(&fmt_cmd.step);
 }
