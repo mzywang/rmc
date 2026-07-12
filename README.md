@@ -28,6 +28,8 @@ zig build run -- --config /etc/rmc/config.yaml
 zig build run
 ```
 
+This blocks the terminal. In a separate terminal:
+
 ```bash
 curl http://localhost:5882/hello
 ```
