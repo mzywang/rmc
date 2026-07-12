@@ -47,3 +47,7 @@ zig build e2e
 Builds the binary, runs it as a real subprocess against `tests/config.yaml` (debug logging off by default, independent of the root `config.yaml` used for local development), then runs every test case in `tests/` against it over real HTTP, reporting pass/fail per case.
 
 To add a test case, drop a new executable `*_test.sh` script in `tests/` (see `server_test.sh` for an example). It runs with `$PORT` set to the server's port and can use the assertion helpers in `tests/lib.sh`. To remove one, delete the file.
+
+## Formatting
+
+CI checks `zig fmt --check` on every PR. Running `zig build` (in any form — `run`, `e2e`, or plain) automatically enables the repo's git hooks (`git config core.hooksPath .githooks`), which blocks commits that would fail the formatting check.

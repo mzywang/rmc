@@ -21,7 +21,10 @@ pub fn build(b: *std.Build) void {
         }),
     });
 
+    const configure_hooks_cmd = b.addSystemCommand(&.{ "git", "config", "core.hooksPath", ".githooks" });
+
     b.installArtifact(exe);
+    b.getInstallStep().dependOn(&configure_hooks_cmd.step);
 
     const run_cmd = b.addRunArtifact(exe);
     run_cmd.step.dependOn(b.getInstallStep());
