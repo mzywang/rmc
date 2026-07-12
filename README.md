@@ -32,6 +32,18 @@ zig build run -- --config /etc/rmc/config.yaml
 zig build run
 ```
 
+This blocks the terminal. In a separate terminal:
+
 ```bash
 curl http://localhost:5882/hello
 ```
+
+## Test
+
+```bash
+zig build e2e
+```
+
+Builds the binary, runs it as a real subprocess against `tests/config.yaml` (debug logging off by default, independent of the root `config.yaml` used for local development), then runs every test case in `tests/` against it over real HTTP, reporting pass/fail per case.
+
+To add a test case, drop a new executable `*_test.sh` script in `tests/` (see `server_test.sh` for an example). It runs with `$PORT` set to the server's port and can use the assertion helpers in `tests/lib.sh`. To remove one, delete the file.

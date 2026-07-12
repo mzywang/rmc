@@ -1,0 +1,17 @@
+name: e2e
+
+on:
+  pull_request:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Zig
+        run: |
+          curl -L -o zig.tar.xz https://ziglang.org/download/0.16.0/zig-x86_64-linux-0.16.0.tar.xz
+          tar -xf zig.tar.xz
+          echo "$PWD/zig-x86_64-linux-0.16.0" >> "$GITHUB_PATH"
+      - run: zig version
+      - run: zig build e2e
