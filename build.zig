@@ -32,7 +32,7 @@ pub fn build(b: *std.Build) void {
     const run_step = b.step("run", "Run the app");
     run_step.dependOn(&run_cmd.step);
 
-    const e2e_cmd = b.addSystemCommand(&.{"scripts/test-e2e.sh"});
+    const e2e_cmd = b.addSystemCommand(&.{"scripts/test_e2e.sh"});
     e2e_cmd.step.dependOn(b.getInstallStep());
 
     const e2e_step = b.step("e2e", "Run the black-box end-to-end test");
