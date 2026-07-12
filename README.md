@@ -2,6 +2,8 @@
 
 A minimal HTTP server written in Zig using [http.zig](https://github.com/karlseguin/http.zig).
 
+See [`docs/endpoints.md`](docs/endpoints.md) for the list of HTTP endpoints this service serves.
+
 ## Requirements
 
 - Zig 0.16.0
