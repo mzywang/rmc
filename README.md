@@ -50,10 +50,4 @@ To add a test case, drop a new executable `*_test.sh` script in `tests/` (see `s
 
 ## Formatting
 
-CI checks `zig fmt --check` on every PR. To catch this locally before committing, enable the repo's git hooks:
-
-```bash
-git config core.hooksPath .githooks
-```
-
-This blocks commits that would fail the formatting check.
+CI checks `zig fmt --check` on every PR. Running `zig build` (in any form — `run`, `e2e`, or plain) automatically enables the repo's git hooks (`git config core.hooksPath .githooks`), which blocks commits that would fail the formatting check.
