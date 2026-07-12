@@ -6,12 +6,15 @@ cd "$(dirname "$0")/.."
 BIN="zig-out/bin/rmc"
 export PORT="$(grep -E '^port:' config.yaml | awk '{print $2}')"
 
-"$BIN" &
+SERVER_LOG="$(mktemp)"
+
+"$BIN" > "$SERVER_LOG" 2>&1 &
 SERVER_PID=$!
 
 cleanup() {
     kill "$SERVER_PID" 2>/dev/null || true
     wait "$SERVER_PID" 2>/dev/null || true
+    rm -f "$SERVER_LOG"
 }
 trap cleanup EXIT
 
@@ -41,5 +44,8 @@ echo
 echo "$((total - failures))/$total tests passed"
 
 if [[ "$failures" -gt 0 ]]; then
+    echo
+    echo "--- server log ---"
+    cat "$SERVER_LOG"
     exit 1
 fi
