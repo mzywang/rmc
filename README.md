@@ -31,3 +31,11 @@ zig build run
 ```bash
 curl http://localhost:5882/hello
 ```
+
+## Test
+
+```bash
+zig build e2e
+```
+
+Builds the binary, runs it as a real subprocess, hits `/hello` over HTTP, and checks the response.
