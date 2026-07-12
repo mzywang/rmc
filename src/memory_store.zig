@@ -1,10 +1,6 @@
 const std = @import("std");
 const Store = @import("store.zig").Store;
 
-/// In-memory Store implementation. Not persistent; exists as a stand-in
-/// for a real backend (e.g. RocksDB) while the Store interface and its
-/// call sites are being built out. Safe for concurrent access from
-/// httpz's worker threads.
 const SpinLock = struct {
     locked: std.atomic.Value(bool) = .init(false),
 
