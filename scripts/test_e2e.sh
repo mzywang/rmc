@@ -25,7 +25,7 @@ done
 total=0
 failures=0
 
-for test_file in scripts/e2e/*_test.sh; do
+for test_file in tests/*_test.sh; do
     name="$(basename "$test_file" _test.sh)"
 
     total=$((total + 1))
