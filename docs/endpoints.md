@@ -63,6 +63,19 @@ content-type: application/json
 }
 ```
 
+If `company_id` has already been recorded, the request is rejected rather than overwriting or duplicating the existing record:
+
+- Status: `409 Conflict`
+
+```
+HTTP/1.1 409 Conflict
+content-type: application/json
+
+{
+  "error": "company_id already exists"
+}
+```
+
 ## Unmatched routes
 
 Any request to a path that isn't registered above returns `404 Not Found`.
