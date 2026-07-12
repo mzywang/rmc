@@ -1,8 +1,8 @@
 # Endpoints
 
-## `GET /hello`
+## `GET /choices`
 
-Returns a static greeting.
+Returns the list of choices.
 
 **Request**
 
@@ -11,12 +11,24 @@ No parameters, headers, or body required.
 **Response**
 
 - Status: `200 OK`
-- Body: `Hello, world!`
 
 **Example**
 
 ```bash
-curl http://localhost:5882/hello
+curl -i http://localhost:5882/choices
+```
+
+```
+HTTP/1.1 200 OK
+content-type: application/json
+
+[
+  {
+    "id": "...",
+    "option_a": "...",
+    "option_b": "..."
+  }
+]
 ```
 
 ## Unmatched routes
