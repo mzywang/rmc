@@ -12,9 +12,13 @@ By default, the server reads `config.yaml` from the working directory:
 
 ```yaml
 port: 5882
+debug: true
 ```
 
-The config path is required to exist; the server fails to start if it's missing. Override the path with `--config`:
+- `port` is required; the server fails to start if it or the config file itself is missing.
+- `debug` is optional (defaults to `false`). When `true`, the server logs every handled request (method, path, status). The default `config.yaml` used for local development has it on.
+
+Override the config path with `--config`:
 
 ```bash
 zig build run -- --config /etc/rmc/config.yaml
