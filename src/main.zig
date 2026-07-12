@@ -1,7 +1,7 @@
 const std = @import("std");
 const httpz = @import("httpz");
 const config = @import("config.zig");
-const Logger = @import("logger.zig");
+const RequestLogger = @import("request_logger.zig");
 
 pub fn main(init: std.process.Init) !void {
     const allocator = init.gpa;
@@ -16,9 +16,9 @@ pub fn main(init: std.process.Init) !void {
         server.deinit();
     }
 
-    const logger = try server.middleware(Logger, .{});
+    const request_logger = try server.middleware(RequestLogger, .{});
 
-    var router = try server.router(.{ .middlewares = &.{logger} });
+    var router = try server.router(.{ .middlewares = &.{request_logger} });
     router.get("/hello", hello, .{});
 
     std.log.info("listening on http://localhost:{d}", .{cfg.port});
