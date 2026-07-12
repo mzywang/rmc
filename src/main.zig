@@ -1,7 +1,7 @@
 const std = @import("std");
 const httpz = @import("httpz");
 const config = @import("config.zig");
-const RequestLogger = @import("request_logger.zig");
+const RequestLogger = @import("middleware/request_logger.zig");
 
 pub fn main(init: std.process.Init) !void {
     const allocator = init.gpa;
