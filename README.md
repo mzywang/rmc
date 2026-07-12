@@ -25,9 +25,3 @@ zig build run
 ```bash
 curl http://localhost:5882/hello
 ```
-
-## Test
-
-```bash
-zig build test
-```
