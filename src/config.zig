@@ -5,10 +5,7 @@ pub const Config = struct {
 };
 
 pub fn load(dir: std.Io.Dir, io: std.Io, gpa: std.mem.Allocator, path: []const u8) !Config {
-    const contents = dir.readFileAlloc(io, path, gpa, .limited(64 * 1024)) catch |err| switch (err) {
-        error.FileNotFound => return .{},
-        else => return err,
-    };
+    const contents = try dir.readFileAlloc(io, path, gpa, .limited(64 * 1024));
     defer gpa.free(contents);
 
     var config: Config = .{};

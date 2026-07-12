@@ -14,7 +14,7 @@ The server reads `config.yaml` from the working directory:
 port: 5882
 ```
 
-If `config.yaml` is missing, it defaults to port `5882`.
+`config.yaml` is required; the server fails to start if it's missing.
 
 ## Run locally
 
