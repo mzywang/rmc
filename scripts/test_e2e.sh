@@ -28,6 +28,7 @@ done
 
 total=0
 failures=0
+failure_details=()
 
 TIMEFORMAT='%R'
 
@@ -53,6 +54,7 @@ for test_file in tests/*_test.sh; do
     else
         echo "[FAIL] $name (${elapsed}s): $output"
         failures=$((failures + 1))
+        failure_details+=("$name (${elapsed}s): $output")
     fi
 done
 
@@ -63,5 +65,10 @@ if [[ "$failures" -gt 0 ]]; then
     echo
     echo "--- server log ---"
     cat "$SERVER_LOG"
+    echo
+    echo "--- failures ---"
+    for detail in "${failure_details[@]}"; do
+        echo "[FAIL] $detail"
+    done
     exit 1
 fi
