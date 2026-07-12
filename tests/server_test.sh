@@ -9,3 +9,7 @@ rm -f "$BODY_FILE"
 
 assert_status 200 "$STATUS"
 assert_body "Hello, world!" "$BODY"
+
+STATUS="$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:${PORT}/does-not-exist")"
+
+assert_status 404 "$STATUS"

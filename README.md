@@ -40,4 +40,4 @@ zig build e2e
 
 Builds the binary, runs it as a real subprocess, then runs every test case in `tests/` against it over real HTTP, reporting pass/fail per case.
 
-To add a test case, drop a new executable `*_test.sh` script in `tests/` (see `hello_test.sh` for an example). It runs with `$PORT` set to the server's port and can use the assertion helpers in `tests/lib.sh`. To remove one, delete the file.
+To add a test case, drop a new executable `*_test.sh` script in `tests/` (see `server_test.sh` for an example). It runs with `$PORT` set to the server's port and can use the assertion helpers in `tests/lib.sh`. To remove one, delete the file.
