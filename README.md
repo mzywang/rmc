@@ -57,22 +57,23 @@ zig build fmt
 
 ## Docker
 
-```bash
-docker build -t rmc .
-```
+Two build targets, sharing one `builder` stage:
 
-Builds an image with this project's actual toolchain (Zig 0.16.0, `jq`, `git`, `curl`) installed, so the [Requirements](#requirements) list above doesn't drift from what's really needed — `docker build` fails if a dependency listed there is missing from the image.
+- `test` — the full toolchain (Zig 0.16.0, `jq`, `git`, `curl`) installed, so the [Requirements](#requirements) list above doesn't drift from what's really needed — `docker build` fails if a dependency listed there is missing.
+- (default, i.e. no `--target`) — just the compiled binary and `config.yaml`, nothing else. This is what actually runs the server; it doesn't need `jq`/`git`/`zig` at all.
 
 Run the same test loop as [Test](#test):
 
 ```bash
-docker run --rm rmc ./scripts/test_e2e.sh
+docker build --target test -t rmc:test .
+docker run --rm rmc:test
 ```
 
 Or run the server itself:
 
 ```bash
-docker run --rm -p 5882:5882 rmc ./zig-out/bin/rmc
+docker build -t rmc .
+docker run --rm -p 5882:5882 rmc
 ```
 
 then `curl http://localhost:5882/choices` from the host.
