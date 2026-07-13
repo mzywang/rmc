@@ -8,11 +8,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Zig
-        run: |
-          curl -L -o zig.tar.xz https://ziglang.org/download/0.16.0/zig-x86_64-linux-0.16.0.tar.xz
-          tar -xf zig.tar.xz
-          echo "$PWD/zig-x86_64-linux-0.16.0" >> "$GITHUB_PATH"
-      - run: zig version
-      - run: zig build
-      - run: ./scripts/test_e2e.sh
+      - run: docker build --target test --build-arg ZIG_ARCH=x86_64 -t rmc:test .
+      - run: docker run --rm rmc:test
