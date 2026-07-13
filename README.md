@@ -16,7 +16,7 @@ debug: true
 - `port` is required; the server fails to start if it or the config file itself is missing.
 - `debug` is optional (defaults to `false`). When `true`, the server logs every handled request (method, path, status). The default `config.yaml` used for local development has it on.
 
-## Local development
+## Local Development
 
 ### Test
 
@@ -67,14 +67,16 @@ Two build targets, sharing one `builder` stage. `docker build` fails if a depend
 
 Both require `--target` explicitly; neither is a default.
 
-Run the same test loop as [Test](#test) — this is also what CI runs, so it's a good pre-push check that doesn't depend on what's installed locally:
+### Test
+
+Runs the same test loop as [Test](#test) above — this is also what CI runs, so it's a good pre-push check that doesn't depend on what's installed locally:
 
 ```bash
 docker build --target test -t rmc:test .
 docker run --rm rmc:test
 ```
 
-Or run the server itself:
+### Run
 
 ```bash
 docker build --target runtime -t rmc:runtime .
