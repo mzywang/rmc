@@ -21,12 +21,6 @@ debug: true
 - `port` is required; the server fails to start if it or the config file itself is missing.
 - `debug` is optional (defaults to `false`). When `true`, the server logs every handled request (method, path, status). The default `config.yaml` used for local development has it on.
 
-Override the config path with `--config`:
-
-```bash
-zig build run -- --config /etc/rmc/config.yaml
-```
-
 ## Local development
 
 ### Test
@@ -35,7 +29,7 @@ zig build run -- --config /etc/rmc/config.yaml
 zig build && ./scripts/test_e2e.sh
 ```
 
-### Run locally
+### Run
 
 ```bash
 zig build run
@@ -45,6 +39,12 @@ This blocks the terminal. In a separate terminal:
 
 ```bash
 curl http://localhost:5882/hello
+```
+
+Override the config path with `--config`:
+
+```bash
+zig build run -- --config /etc/rmc/config.yaml
 ```
 
 ### Pre-commit hook
