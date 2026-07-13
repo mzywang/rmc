@@ -35,7 +35,9 @@ pub const MemoryStore = struct {
     const vtable = Store.VTable{
         .get = get,
         .put = put,
+        .putIfAbsent = putIfAbsent,
         .delete = delete,
+        .list = list,
         .close = close,
     };
 
@@ -65,6 +67,20 @@ pub const MemoryStore = struct {
         try self.entries.put(self.allocator, owned_key, owned_value);
     }
 
+    fn putIfAbsent(ptr: *anyopaque, key: []const u8, value: []const u8) anyerror!bool {
+        const self: *MemoryStore = @ptrCast(@alignCast(ptr));
+        self.mutex.lock();
+        defer self.mutex.unlock();
+
+        if (self.entries.contains(key)) return false;
+
+        const owned_value = try self.allocator.dupe(u8, value);
+        errdefer self.allocator.free(owned_value);
+        const owned_key = try self.allocator.dupe(u8, key);
+        try self.entries.put(self.allocator, owned_key, owned_value);
+        return true;
+    }
+
     fn delete(ptr: *anyopaque, key: []const u8) anyerror!void {
         const self: *MemoryStore = @ptrCast(@alignCast(ptr));
         self.mutex.lock();
@@ -74,6 +90,22 @@ pub const MemoryStore = struct {
             self.allocator.free(old.key);
             self.allocator.free(old.value);
         }
+    }
+
+    fn list(ptr: *anyopaque, allocator: std.mem.Allocator) anyerror![]Store.Entry {
+        const self: *MemoryStore = @ptrCast(@alignCast(ptr));
+        self.mutex.lock();
+        defer self.mutex.unlock();
+
+        var out = try std.array_list.Managed(Store.Entry).initCapacity(allocator, self.entries.count());
+        var it = self.entries.iterator();
+        while (it.next()) |entry| {
+            out.appendAssumeCapacity(.{
+                .key = try allocator.dupe(u8, entry.key_ptr.*),
+                .value = try allocator.dupe(u8, entry.value_ptr.*),
+            });
+        }
+        return out.toOwnedSlice();
     }
 
     fn close(ptr: *anyopaque) void {
