@@ -48,9 +48,16 @@ zig build run -- --config /etc/rmc/config.yaml
 zig build fmt
 ```
 
-## Docker
+## CI
 
-### Requirements
+Two checks run on every PR:
+
+- **fmt** (`.github/workflows/fmt.yml`) — `zig fmt --check` on `build.zig`, `build.zig.zon`, and `src/`.
+- **e2e** (`.github/workflows/e2e.yml`) — builds and runs the Docker `test` target below.
+
+### Docker
+
+#### Requirements
 
 Two build targets, sharing one `builder` stage. `docker build` fails if a dependency below is missing, so this list doesn't drift from what's really needed.
 
@@ -61,14 +68,14 @@ Two build targets, sharing one `builder` stage. `docker build` fails if a depend
 - `git`
 - `curl`
 
-### Test
+#### Test
 
 ```bash
 docker build --target test -t rmc:test .
 docker run --rm rmc:test
 ```
 
-### Run
+#### Run
 
 ```bash
 docker build --target runtime -t rmc:runtime .

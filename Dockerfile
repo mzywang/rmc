@@ -22,13 +22,9 @@ COPY . .
 
 RUN zig build
 
-# `docker build --target test` - has the full toolchain (jq, git, curl),
-# needed to run tests/*.sh.
 FROM builder AS test
 CMD ["./scripts/test_e2e.sh"]
 
-# `docker build` (default, last stage) - just the compiled binary and
-# config, no Zig/jq/git/curl. This is what actually runs the server.
 FROM debian:bookworm-slim AS runtime
 WORKDIR /app
 COPY --from=builder /app/zig-out/bin/rmc ./zig-out/bin/rmc
