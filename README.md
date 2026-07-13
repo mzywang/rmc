@@ -60,7 +60,9 @@ zig build fmt
 Two build targets, sharing one `builder` stage:
 
 - `test` — the full toolchain (Zig 0.16.0, `jq`, `git`, `curl`) installed, so the [Requirements](#requirements) list above doesn't drift from what's really needed — `docker build` fails if a dependency listed there is missing.
-- (default, i.e. no `--target`) — just the compiled binary and `config.yaml`, nothing else. This is what actually runs the server; it doesn't need `jq`/`git`/`zig` at all.
+- `runtime` — just the compiled binary and `config.yaml`, nothing else. This is what actually runs the server; it doesn't need `jq`/`git`/`zig` at all.
+
+Both require `--target` explicitly; neither is a default.
 
 Run the same test loop as [Test](#test):
 
@@ -72,8 +74,8 @@ docker run --rm rmc:test
 Or run the server itself:
 
 ```bash
-docker build -t rmc .
-docker run --rm -p 5882:5882 rmc
+docker build --target runtime -t rmc:runtime .
+docker run --rm -p 5882:5882 rmc:runtime
 ```
 
 then `curl http://localhost:5882/choices` from the host.
