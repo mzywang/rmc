@@ -36,6 +36,7 @@ pub fn main(init: std.process.Init) !void {
     var router = try server.router(.{ .middlewares = &.{request_logger} });
     router.get("/choices", listChoices, .{});
     router.post("/companies", createCompany, .{});
+    router.get("/companies", listCompanies, .{});
 
     std.log.info("listening on http://localhost:{d}", .{cfg.port});
     try server.listen();
@@ -68,6 +69,23 @@ fn createCompany(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
 
     res.status = 201;
     try res.json(.{ .company_id = parsed.company_id, .created_at = created_at }, .{});
+}
+
+const Company = struct {
+    company_id: []const u8,
+    created_at: []const u8,
+};
+
+fn listCompanies(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
+    const entries = try app.store.list(req.arena);
+
+    const companies = try req.arena.alloc(Company, entries.len);
+    for (entries, 0..) |entry, i| {
+        companies[i] = .{ .company_id = entry.key, .created_at = entry.value };
+    }
+
+    res.status = 200;
+    try res.json(companies, .{});
 }
 
 fn formatTimestamp(allocator: std.mem.Allocator, io: std.Io) ![]const u8 {

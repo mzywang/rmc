@@ -37,6 +37,7 @@ pub const MemoryStore = struct {
         .put = put,
         .putIfAbsent = putIfAbsent,
         .delete = delete,
+        .list = list,
         .close = close,
     };
 
@@ -89,6 +90,22 @@ pub const MemoryStore = struct {
             self.allocator.free(old.key);
             self.allocator.free(old.value);
         }
+    }
+
+    fn list(ptr: *anyopaque, allocator: std.mem.Allocator) anyerror![]Store.Entry {
+        const self: *MemoryStore = @ptrCast(@alignCast(ptr));
+        self.mutex.lock();
+        defer self.mutex.unlock();
+
+        var out = try std.array_list.Managed(Store.Entry).initCapacity(allocator, self.entries.count());
+        var it = self.entries.iterator();
+        while (it.next()) |entry| {
+            out.appendAssumeCapacity(.{
+                .key = try allocator.dupe(u8, entry.key_ptr.*),
+                .value = try allocator.dupe(u8, entry.value_ptr.*),
+            });
+        }
+        return out.toOwnedSlice();
     }
 
     fn close(ptr: *anyopaque) void {
