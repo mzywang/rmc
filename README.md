@@ -55,3 +55,20 @@ To add a test case, drop a new executable `*_test.sh` script in `tests/` (see `c
 zig build fmt
 ```
 
+## Docker
+
+```bash
+docker build -t rmc .
+docker run --rm rmc
+```
+
+Builds an image with this project's actual toolchain (Zig 0.16.0, `jq`, `git`, `curl`) installed, so the [Requirements](#requirements) list above doesn't drift from what's really needed — `docker build` fails if a dependency listed there is missing from the image. The default command runs the same `zig build && ./scripts/test_e2e.sh` loop as [Test](#test).
+
+To run the server itself instead:
+
+```bash
+docker run --rm -p 5882:5882 rmc ./zig-out/bin/rmc
+```
+
+Note: the server currently binds to `127.0.0.1` inside the container (see `.localhost(cfg.port)` in `src/main.zig`), so it's reachable from other processes *inside* the container but not from the host via the mapped port above — that's an existing app-level bind-address choice, not something this image works around.
+
