@@ -7,6 +7,7 @@ See [`docs/endpoints.md`](docs/endpoints.md) for the list of HTTP endpoints this
 ## Requirements
 
 - Zig 0.16.0
+- `jq` (used by `tests/companies_test.sh`)
 
 ## Configuration
 
@@ -46,7 +47,7 @@ curl http://localhost:5882/hello
 zig build && ./scripts/test_e2e.sh
 ```
 
-To add a test case, drop a new executable `*_test.sh` script in `tests/` (see `server_test.sh` for an example). It runs with `$PORT` set to the server's port and can use the assertion helpers in `tests/lib.sh`. To remove one, delete the file.
+To add a test case, drop a new executable `*_test.sh` script in `tests/` (see `choices_test.sh` for an example). It runs with `$PORT` set to the server's port and can use the assertion helpers in `tests/lib.sh`. To remove one, delete the file.
 
 ## Formatting
 
