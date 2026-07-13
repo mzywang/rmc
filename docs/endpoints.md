@@ -2,33 +2,49 @@
 
 ## `GET /choices`
 
-Returns the list of choices.
+Looks at all recorded companies and applies a function to the full set to produce a list of choices. The current function generates every possible pair of two companies.
+
+Results are cursor-paginated: only the requested page is generated, not the full list.
 
 **Request**
 
-No parameters, headers, or body required.
+- Query parameters (all optional):
+  - `cursor` — opaque position to resume from; omit to start from the beginning
+  - `limit` — maximum number of choices to return in this page
 
 **Response**
 
 - Status: `200 OK`
+- Body: JSON object:
+  - `choices` — page of choices, each with `id`, `option_a`, `option_b`
+  - `next_cursor` — cursor for the next page, or `null` if this is the last page
 
 **Example**
 
 ```bash
-curl -i http://localhost:5882/choices
+curl -i "http://localhost:5882/choices?limit=1"
 ```
 
 ```
 HTTP/1.1 200 OK
 content-type: application/json
 
-[
-  {
-    "id": "...",
-    "option_a": "...",
-    "option_b": "..."
-  }
-]
+{
+  "choices": [
+    {
+      "id": "acme:globex",
+      "option_a": "acme",
+      "option_b": "globex"
+    }
+  ],
+  "next_cursor": 1
+}
+```
+
+Fetch the next page by passing the returned `next_cursor` back in:
+
+```bash
+curl -i "http://localhost:5882/choices?limit=1&cursor=1"
 ```
 
 ## `POST /companies`
