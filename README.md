@@ -25,8 +25,6 @@ Override the config path with `--config`:
 
 ```bash
 zig build run -- --config /etc/rmc/config.yaml
-# or
-./zig-out/bin/rmc --config=/etc/rmc/config.yaml
 ```
 
 ## Run locally
