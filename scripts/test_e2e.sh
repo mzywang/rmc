@@ -2,20 +2,7 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
-
-if [[ -z "${NO_COLOR:-}" ]]; then
-    BOLD=$'\033[1m'
-    DIM=$'\033[2m'
-    RED=$'\033[31m'
-    GREEN=$'\033[32m'
-    RESET=$'\033[0m'
-else
-    BOLD=""
-    DIM=""
-    RED=""
-    GREEN=""
-    RESET=""
-fi
+source "tests/lib.sh"
 
 section() {
     echo
@@ -47,7 +34,7 @@ done
 
 total=0
 failures=0
-failure_details=()
+failure_names=()
 
 TIMEFORMAT='%R'
 
@@ -56,14 +43,13 @@ for test_file in tests/*_test.sh; do
 
     total=$((total + 1))
 
+    echo
+    echo "${BOLD}${name}${RESET}"
+
     time_file="$(mktemp)"
     set +e
-    {
-        time {
-            output="$("$test_file" 2>&1)"
-            rc=$?
-        }
-    } 2>"$time_file"
+    { time "$test_file"; } 2>"$time_file"
+    rc=$?
     set -e
     elapsed="$(cat "$time_file")"
     rm -f "$time_file"
@@ -71,9 +57,9 @@ for test_file in tests/*_test.sh; do
     if [[ "$rc" -eq 0 ]]; then
         echo "${GREEN}[PASS]${RESET} $name ${DIM}(${elapsed}s)${RESET}"
     else
-        echo "${RED}[FAIL]${RESET} $name ${DIM}(${elapsed}s)${RESET}: $output"
+        echo "${RED}[FAIL]${RESET} $name ${DIM}(${elapsed}s)${RESET}"
         failures=$((failures + 1))
-        failure_details+=("$name (${elapsed}s): $output")
+        failure_names+=("$name (${elapsed}s)")
     fi
 done
 
@@ -88,8 +74,8 @@ else
     cat "$SERVER_LOG"
 
     section "failures"
-    for detail in "${failure_details[@]}"; do
-        echo "${RED}[FAIL]${RESET} $detail"
+    for name in "${failure_names[@]}"; do
+        echo "${RED}[FAIL]${RESET} $name"
     done
     exit 1
 fi
