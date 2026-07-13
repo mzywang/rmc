@@ -33,7 +33,7 @@ zig build run
 This blocks the terminal. In a separate terminal:
 
 ```bash
-curl http://localhost:5882/hello
+curl http://localhost:5882/choices
 ```
 
 Override the config path with `--config`:
@@ -52,24 +52,14 @@ zig build fmt
 
 ### Requirements
 
-Two build targets, sharing one `builder` stage. `docker build` fails if a dependency below is missing, so these lists don't drift from what's really needed.
+Two build targets, sharing one `builder` stage. `docker build` fails if a dependency below is missing, so this list doesn't drift from what's really needed.
 
 `builder`:
 
 - Zig 0.16.0
-- `jq` (used by `tests/companies_test.sh`)
-- `git` (required by `build.zig`'s `install` step)
-- `curl` (used by `tests/*.sh`)
-
-`test`:
-
-- none — inherits everything from `builder`, adds nothing of its own.
-
-`runtime`:
-
-- none — just the compiled binary and `config.yaml`, nothing else.
-
-Both require `--target` explicitly; neither is a default.
+- `jq`
+- `git`
+- `curl`
 
 ### Test
 
