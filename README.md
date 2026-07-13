@@ -7,6 +7,7 @@ See [`docs/endpoints.md`](docs/endpoints.md) for the list of HTTP endpoints this
 ## Requirements
 
 - Zig 0.16.0
+- `jq` (used by `tests/companies_seed_test.sh`)
 
 ## Configuration
 
