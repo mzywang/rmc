@@ -51,11 +51,13 @@ This is the fast local loop while actively editing — no container overhead, us
 
 To add a test case, drop a new executable `*_test.sh` script in `tests/` (see `choices_test.sh` for an example). It runs with `$PORT` set to the server's port and can use the assertion helpers in `tests/lib.sh`. To remove one, delete the file.
 
-## Formatting
+### Pre-commit hook
 
 ```bash
 zig build fmt
 ```
+
+Formats `build.zig`, `build.zig.zon`, and `src/` in place. Running `zig build` (in any form — `run` or plain) automatically points git at this repo's hooks (`git config core.hooksPath .githooks`). The installed `pre-commit` hook then runs `zig fmt --check` on staged `.zig`/`.zon` files and blocks the commit if any would be reformatted — it points you at `zig build fmt` if it fails. CI enforces the same check on every PR.
 
 ## Docker
 
