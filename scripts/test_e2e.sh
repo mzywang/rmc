@@ -3,6 +3,25 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+if [[ -z "${NO_COLOR:-}" ]]; then
+    BOLD=$'\033[1m'
+    DIM=$'\033[2m'
+    RED=$'\033[31m'
+    GREEN=$'\033[32m'
+    RESET=$'\033[0m'
+else
+    BOLD=""
+    DIM=""
+    RED=""
+    GREEN=""
+    RESET=""
+fi
+
+section() {
+    echo
+    echo "${BOLD}── $1 ──${RESET}"
+}
+
 BIN="zig-out/bin/rmc"
 TEST_CONFIG="tests/config.yaml"
 export PORT="$(grep -E '^port:' "$TEST_CONFIG" | awk '{print $2}')"
@@ -50,25 +69,27 @@ for test_file in tests/*_test.sh; do
     rm -f "$time_file"
 
     if [[ "$rc" -eq 0 ]]; then
-        echo "[PASS] $name (${elapsed}s)"
+        echo "${GREEN}[PASS]${RESET} $name ${DIM}(${elapsed}s)${RESET}"
     else
-        echo "[FAIL] $name (${elapsed}s): $output"
+        echo "${RED}[FAIL]${RESET} $name ${DIM}(${elapsed}s)${RESET}: $output"
         failures=$((failures + 1))
         failure_details+=("$name (${elapsed}s): $output")
     fi
 done
 
-echo
-echo "$((total - failures))/$total tests passed"
+if [[ "$failures" -eq 0 ]]; then
+    echo
+    echo "${GREEN}${BOLD}$((total - failures))/$total tests passed${RESET}"
+else
+    echo
+    echo "${RED}${BOLD}$((total - failures))/$total tests passed${RESET}"
 
-if [[ "$failures" -gt 0 ]]; then
-    echo
-    echo "--- server log ---"
+    section "server log"
     cat "$SERVER_LOG"
-    echo
-    echo "--- failures ---"
+
+    section "failures"
     for detail in "${failure_details[@]}"; do
-        echo "[FAIL] $detail"
+        echo "${RED}[FAIL]${RESET} $detail"
     done
     exit 1
 fi
