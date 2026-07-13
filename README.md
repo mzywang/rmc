@@ -69,8 +69,6 @@ Both require `--target` explicitly; neither is a default.
 
 ### Test
 
-Runs the same test loop as [Test](#test) above — this is also what CI runs, so it's a good pre-push check that doesn't depend on what's installed locally:
-
 ```bash
 docker build --target test -t rmc:test .
 docker run --rm rmc:test
