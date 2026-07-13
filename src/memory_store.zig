@@ -35,6 +35,7 @@ pub const MemoryStore = struct {
     const vtable = Store.VTable{
         .get = get,
         .put = put,
+        .putIfAbsent = putIfAbsent,
         .delete = delete,
         .close = close,
     };
@@ -63,6 +64,20 @@ pub const MemoryStore = struct {
 
         const owned_key = try self.allocator.dupe(u8, key);
         try self.entries.put(self.allocator, owned_key, owned_value);
+    }
+
+    fn putIfAbsent(ptr: *anyopaque, key: []const u8, value: []const u8) anyerror!bool {
+        const self: *MemoryStore = @ptrCast(@alignCast(ptr));
+        self.mutex.lock();
+        defer self.mutex.unlock();
+
+        if (self.entries.contains(key)) return false;
+
+        const owned_value = try self.allocator.dupe(u8, value);
+        errdefer self.allocator.free(owned_value);
+        const owned_key = try self.allocator.dupe(u8, key);
+        try self.entries.put(self.allocator, owned_key, owned_value);
+        return true;
     }
 
     fn delete(ptr: *anyopaque, key: []const u8) anyerror!void {
