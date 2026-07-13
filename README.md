@@ -27,7 +27,17 @@ Override the config path with `--config`:
 zig build run -- --config /etc/rmc/config.yaml
 ```
 
-## Development
+## Local development
+
+### Test
+
+```bash
+zig build && ./scripts/test_e2e.sh
+```
+
+This is the fast local loop while actively editing — no container overhead, uses whatever Zig you already have installed. Before pushing, it's worth also running the [Docker test target](#docker), which is what CI actually runs and doesn't depend on your machine having the right toolchain versions installed.
+
+To add a test case, drop a new executable `*_test.sh` script in `tests/` (see `choices_test.sh` for an example). It runs with `$PORT` set to the server's port and can use the assertion helpers in `tests/lib.sh`. To remove one, delete the file.
 
 ### Run locally
 
@@ -40,16 +50,6 @@ This blocks the terminal. In a separate terminal:
 ```bash
 curl http://localhost:5882/hello
 ```
-
-### Test
-
-```bash
-zig build && ./scripts/test_e2e.sh
-```
-
-This is the fast local loop while actively editing — no container overhead, uses whatever Zig you already have installed. Before pushing, it's worth also running the [Docker test target](#docker), which is what CI actually runs and doesn't depend on your machine having the right toolchain versions installed.
-
-To add a test case, drop a new executable `*_test.sh` script in `tests/` (see `choices_test.sh` for an example). It runs with `$PORT` set to the server's port and can use the assertion helpers in `tests/lib.sh`. To remove one, delete the file.
 
 ### Pre-commit hook
 
