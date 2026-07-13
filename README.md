@@ -53,8 +53,6 @@ zig build run -- --config /etc/rmc/config.yaml
 zig build fmt
 ```
 
-Formats `build.zig`, `build.zig.zon`, and `src/` in place. Running `zig build` (in any form — `run` or plain) automatically points git at this repo's hooks (`git config core.hooksPath .githooks`). The installed `pre-commit` hook then runs `zig fmt --check` on staged `.zig`/`.zon` files and blocks the commit if any would be reformatted — it points you at `zig build fmt` if it fails. CI enforces the same check on every PR.
-
 ## Docker
 
 Two build targets, sharing one `builder` stage:
