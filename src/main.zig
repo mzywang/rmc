@@ -3,6 +3,7 @@ const httpz = @import("httpz");
 const config = @import("config.zig");
 const RequestLogger = @import("middleware/request_logger.zig");
 const store = @import("store.zig");
+const choices = @import("choices.zig");
 
 const App = struct {
     store: store.Store,
@@ -42,10 +43,36 @@ pub fn main(init: std.process.Init) !void {
     try server.listen();
 }
 
-fn listChoices(_: *App, _: *httpz.Request, res: *httpz.Response) !void {
+const default_choices_limit: u64 = 20;
+const max_choices_limit: u64 = 100;
+
+fn listChoices(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
+    const entries = try app.store.list(req.arena);
+
+    const company_ids = try req.arena.alloc([]const u8, entries.len);
+    for (entries, 0..) |entry, i| company_ids[i] = entry.key;
+    std.mem.sort([]const u8, company_ids, {}, lessThanString);
+
+    const query = try req.query();
+    const cursor = parseQueryUint(query.get("cursor")) orelse 0;
+    const limit = @min(parseQueryUint(query.get("limit")) orelse default_choices_limit, max_choices_limit);
+
+    const generator = choices.all_pairs;
+    const page = try generator.page(req.arena, company_ids, cursor, limit);
+    const total = generator.total(company_ids);
+    const next_cursor: ?u64 = if (cursor + page.len >= total) null else cursor + page.len;
+
     res.status = 200;
-    res.content_type = .JSON;
-    res.body = "[]";
+    try res.json(.{ .choices = page, .next_cursor = next_cursor }, .{});
+}
+
+fn lessThanString(_: void, a: []const u8, b: []const u8) bool {
+    return std.mem.lessThan(u8, a, b);
+}
+
+fn parseQueryUint(value: ?[]const u8) ?u64 {
+    const v = value orelse return null;
+    return std.fmt.parseUnsigned(u64, v, 10) catch null;
 }
 
 const CreateCompanyRequest = struct {
