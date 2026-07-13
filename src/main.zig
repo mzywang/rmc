@@ -23,15 +23,16 @@ pub fn main(init: std.process.Init) !void {
     const request_logger = try server.middleware(RequestLogger, .{ .enabled = cfg.debug });
 
     var router = try server.router(.{ .middlewares = &.{request_logger} });
-    router.get("/hello", hello, .{});
+    router.get("/choices", listChoices, .{});
 
     std.log.info("listening on http://localhost:{d}", .{cfg.port});
     try server.listen();
 }
 
-fn hello(_: *httpz.Request, res: *httpz.Response) !void {
+fn listChoices(_: *httpz.Request, res: *httpz.Response) !void {
     res.status = 200;
-    res.body = "Hello, world!";
+    res.content_type = .JSON;
+    res.body = "[]";
 }
 
 fn parseConfigPath(args: []const []const u8) ![]const u8 {
