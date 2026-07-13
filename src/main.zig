@@ -24,7 +24,7 @@ pub fn main(init: std.process.Init) !void {
     var app = App{ .store = app_store, .io = init.io };
 
     var server = try httpz.Server(*App).init(init.io, allocator, .{
-        .address = .localhost(cfg.port),
+        .address = .all(cfg.port),
     }, &app);
     defer {
         server.stop();
