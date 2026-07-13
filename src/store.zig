@@ -46,7 +46,6 @@ pub const Store = struct {
         return self.vtable.delete(self.ptr, key);
     }
 
-    /// Returns every entry currently in the store, in unspecified order.
     pub fn list(self: Store, allocator: std.mem.Allocator) ![]Entry {
         return self.vtable.list(self.ptr, allocator);
     }
