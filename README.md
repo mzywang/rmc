@@ -52,15 +52,18 @@ zig build fmt
 
 ### Requirements
 
+Two build targets, sharing one `builder` stage. `docker build` fails if a dependency below is missing, so these lists don't drift from what's really needed.
+
+`test`:
+
 - Zig 0.16.0
 - `jq` (used by `tests/companies_test.sh`)
-- `git`
+- `git` (required by `build.zig`'s `install` step)
 - `curl` (used by `tests/*.sh`)
 
-Two build targets, sharing one `builder` stage:
+`runtime`:
 
-- `test` — the full toolchain above installed, so this list doesn't drift from what's really needed — `docker build` fails if a dependency listed here is missing.
-- `runtime` — just the compiled binary and `config.yaml`, nothing else. This is what actually runs the server; it doesn't need `jq`/`git`/`zig` at all.
+- none — just the compiled binary and `config.yaml`, nothing else.
 
 Both require `--target` explicitly; neither is a default.
 
