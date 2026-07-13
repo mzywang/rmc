@@ -4,13 +4,6 @@ A minimal HTTP server written in Zig using [http.zig](https://github.com/karlseg
 
 See [`docs/endpoints.md`](docs/endpoints.md) for the list of HTTP endpoints this service serves.
 
-## Requirements
-
-- Zig 0.16.0
-- `jq` (used by `tests/companies_test.sh`)
-- `git`
-- `curl` (used by `tests/*.sh`)
-
 ## Configuration
 
 By default, the server reads `config.yaml` from the working directory:
@@ -57,9 +50,16 @@ zig build fmt
 
 ## Docker
 
+### Requirements
+
+- Zig 0.16.0
+- `jq` (used by `tests/companies_test.sh`)
+- `git`
+- `curl` (used by `tests/*.sh`)
+
 Two build targets, sharing one `builder` stage:
 
-- `test` — the full toolchain (Zig 0.16.0, `jq`, `git`, `curl`) installed, so the [Requirements](#requirements) list above doesn't drift from what's really needed — `docker build` fails if a dependency listed there is missing.
+- `test` — the full toolchain above installed, so this list doesn't drift from what's really needed — `docker build` fails if a dependency listed here is missing.
 - `runtime` — just the compiled binary and `config.yaml`, nothing else. This is what actually runs the server; it doesn't need `jq`/`git`/`zig` at all.
 
 Both require `--target` explicitly; neither is a default.
