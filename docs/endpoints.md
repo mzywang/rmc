@@ -76,6 +76,36 @@ content-type: application/json
 }
 ```
 
+## `GET /companies`
+
+Returns the list of recorded companies.
+
+**Request**
+
+No parameters, headers, or body required.
+
+**Response**
+
+- Status: `200 OK`
+
+**Example**
+
+```bash
+curl -i http://localhost:5882/companies
+```
+
+```
+HTTP/1.1 200 OK
+content-type: application/json
+
+[
+  {
+    "company_id": "acme",
+    "created_at": "2026-07-12T18:32:00Z"
+  }
+]
+```
+
 ## Unmatched routes
 
 Any request to a path that isn't registered above returns `404 Not Found`.
