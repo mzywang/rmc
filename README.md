@@ -43,18 +43,10 @@ curl http://localhost:5882/hello
 ## Test
 
 ```bash
-zig build e2e
-```
-
-Builds the binary, runs it as a real subprocess against `tests/config.yaml` (debug logging off by default, independent of the root `config.yaml` used for local development), then runs every test case in `tests/` against it over real HTTP, reporting pass/fail per case.
-
-For local iteration, prefer building once and running the test script directly, which skips `zig build`'s own step-failure reporting noise on top of the test output:
-
-```bash
 zig build && ./scripts/test_e2e.sh
 ```
 
-`zig build e2e` remains the canonical entry point (and what CI runs), since it also handles rebuilding the binary if sources changed.
+Builds the binary, runs it as a real subprocess against `tests/config.yaml` (debug logging off by default, independent of the root `config.yaml` used for local development), then runs every test case in `tests/` against it over real HTTP, reporting pass/fail per case. This is also what CI runs.
 
 To add a test case, drop a new executable `*_test.sh` script in `tests/` (see `server_test.sh` for an example). It runs with `$PORT` set to the server's port and can use the assertion helpers in `tests/lib.sh`. To remove one, delete the file.
 
@@ -64,4 +56,4 @@ To add a test case, drop a new executable `*_test.sh` script in `tests/` (see `s
 zig build fmt
 ```
 
-Formats `build.zig`, `build.zig.zon`, and `src/` in place. CI checks `zig fmt --check` on every PR, and running `zig build` (in any form — `run`, `e2e`, or plain) automatically enables the repo's git hooks (`git config core.hooksPath .githooks`), which blocks commits that would fail the formatting check — both point you at `zig build fmt` if they fail.
+Formats `build.zig`, `build.zig.zon`, and `src/` in place. CI checks `zig fmt --check` on every PR, and running `zig build` (in any form — `run` or plain) automatically enables the repo's git hooks (`git config core.hooksPath .githooks`), which blocks commits that would fail the formatting check — both point you at `zig build fmt` if they fail.
