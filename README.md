@@ -54,12 +54,16 @@ zig build fmt
 
 Two build targets, sharing one `builder` stage. `docker build` fails if a dependency below is missing, so these lists don't drift from what's really needed.
 
-`test`:
+`builder`:
 
 - Zig 0.16.0
 - `jq` (used by `tests/companies_test.sh`)
 - `git` (required by `build.zig`'s `install` step)
 - `curl` (used by `tests/*.sh`)
+
+`test`:
+
+- none — inherits everything from `builder`, adds nothing of its own.
 
 `runtime`:
 
@@ -81,5 +85,9 @@ docker build --target runtime -t rmc:runtime .
 docker run --rm -p 5882:5882 rmc:runtime
 ```
 
-then `curl http://localhost:5882/choices` from the host.
+This blocks the terminal. In a separate terminal:
+
+```bash
+curl http://localhost:5882/choices
+```
 
