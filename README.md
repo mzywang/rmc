@@ -27,7 +27,9 @@ Override the config path with `--config`:
 zig build run -- --config /etc/rmc/config.yaml
 ```
 
-## Run locally
+## Development
+
+### Run locally
 
 ```bash
 zig build run
@@ -39,7 +41,7 @@ This blocks the terminal. In a separate terminal:
 curl http://localhost:5882/hello
 ```
 
-## Test
+### Test
 
 ```bash
 zig build && ./scripts/test_e2e.sh
