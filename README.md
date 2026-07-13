@@ -45,6 +45,8 @@ curl http://localhost:5882/hello
 zig build && ./scripts/test_e2e.sh
 ```
 
+This is the fast local loop while actively editing — no container overhead, uses whatever Zig you already have installed. Before pushing, it's worth also running the [Docker test target](#docker), which is what CI actually runs and doesn't depend on your machine having the right toolchain versions installed.
+
 To add a test case, drop a new executable `*_test.sh` script in `tests/` (see `choices_test.sh` for an example). It runs with `$PORT` set to the server's port and can use the assertion helpers in `tests/lib.sh`. To remove one, delete the file.
 
 ## Formatting
@@ -62,7 +64,7 @@ Two build targets, sharing one `builder` stage:
 
 Both require `--target` explicitly; neither is a default.
 
-Run the same test loop as [Test](#test):
+Run the same test loop as [Test](#test) — this is also what CI runs, so it's a good pre-push check that doesn't depend on what's installed locally:
 
 ```bash
 docker build --target test -t rmc:test .
