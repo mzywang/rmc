@@ -3,19 +3,18 @@ name: e2e
 on:
   pull_request:
 
+env:
+  ZIG_VERSION: "0.16.0"
+
 jobs:
   e2e:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/build-push-action@v6
-        with:
-          context: .
-          target: test
-          build-args: ZIG_ARCH=x86_64
-          tags: rmc:test
-          load: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-      - run: docker run --rm rmc:test
+      - name: Install Zig
+        run: |
+          curl -fL -o /tmp/zig.tar.xz "https://ziglang.org/download/${ZIG_VERSION}/zig-x86_64-linux-${ZIG_VERSION}.tar.xz"
+          tar -xf /tmp/zig.tar.xz -C "$HOME"
+          mv "$HOME/zig-x86_64-linux-${ZIG_VERSION}" "$HOME/zig"
+          echo "$HOME/zig" >> "$GITHUB_PATH"
+      - run: zig build && ./scripts/test_e2e.sh
