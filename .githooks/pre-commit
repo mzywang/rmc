@@ -15,3 +15,21 @@ if ! zig fmt --check "${files[@]}"; then
     echo "Formatting check failed. Run 'zig build fmt' to fix, then re-stage and commit."
     exit 1
 fi
+
+comments="$(git diff --cached --no-color -U0 -- "${files[@]}" | awk '
+    /^\+\+\+ / { next }
+    /^\+/ {
+        line = substr($0, 2)
+        gsub(/"[^"]*"/, "", line)
+        if (line ~ /\/\//) print line
+    }
+')"
+
+if [[ -n "$comments" ]]; then
+    echo
+    echo "New comments detected in staged changes:"
+    echo "$comments"
+    echo
+    echo "Comments should not be added unless explicitly allowed. Remove them, then re-stage and commit."
+    exit 1
+fi
