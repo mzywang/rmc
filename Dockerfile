@@ -16,11 +16,15 @@ RUN curl -fL -o /tmp/zig.tar.xz "https://ziglang.org/download/${ZIG_VERSION}/zig
     && rm /tmp/zig.tar.xz \
     && mv "/usr/local/zig-${ZIG_ARCH}-linux-${ZIG_VERSION}" /usr/local/zig
 ENV PATH="/usr/local/zig:${PATH}"
+ENV ZIG_GLOBAL_CACHE_DIR=/zig-global-cache
+ENV ZIG_LOCAL_CACHE_DIR=/app/.zig-cache
 
 WORKDIR /app
 COPY . .
 
-RUN zig build
+RUN --mount=type=cache,target=/zig-global-cache \
+    --mount=type=cache,target=/app/.zig-cache \
+    zig build
 
 FROM builder AS test
 CMD ["./scripts/test_e2e.sh"]
