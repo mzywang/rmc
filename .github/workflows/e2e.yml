@@ -8,5 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: docker build --target test --build-arg ZIG_ARCH=x86_64 -t rmc:test .
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: test
+          build-args: ZIG_ARCH=x86_64
+          tags: rmc:test
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
       - run: docker run --rm rmc:test
