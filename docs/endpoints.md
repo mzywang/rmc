@@ -47,6 +47,69 @@ Fetch the next page by passing the returned `next_cursor` back in:
 curl -i "http://localhost:5882/choices?limit=1&cursor=1"
 ```
 
+## `POST /choices`
+
+Records a selection for a choice previously returned by `GET /choices`. Every submission is recorded independently — posting the same `id` again does not overwrite or reject the earlier one.
+
+**Request**
+
+- Body: JSON object:
+  - `id` — a choice id, e.g. `"acme:globex"`
+  - `selection` — must be exactly `"option_a"` or `"option_b"`
+
+**Response**
+
+- Status: `201 Created`
+- Body: JSON object:
+  - `id`
+  - `selection`
+  - `company_id` — the company_id `selection` resolved to
+  - `created_at`
+
+**Example**
+
+```bash
+curl -i -X POST -d '{"id":"acme:globex","selection":"option_a"}' http://localhost:5882/choices
+```
+
+```
+HTTP/1.1 201 Created
+content-type: application/json
+
+{
+  "id": "acme:globex",
+  "selection": "option_a",
+  "company_id": "acme",
+  "created_at": "2026-07-12T18:32:00Z"
+}
+```
+
+If `selection` isn't exactly `"option_a"` or `"option_b"`:
+
+- Status: `400 Bad Request`
+
+```
+HTTP/1.1 400 Bad Request
+content-type: application/json
+
+{
+  "error": "selection must be option_a or option_b"
+}
+```
+
+If `id` doesn't resolve to two recorded companies (malformed, or referencing a company that doesn't exist):
+
+- Status: `404 Not Found`
+
+```
+HTTP/1.1 404 Not Found
+content-type: application/json
+
+{
+  "error": "id does not reference two existing companies"
+}
+```
+
 ## `POST /companies`
 
 Records a company submission, storing the given `company_id` alongside a server-assigned creation timestamp.
