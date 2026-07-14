@@ -50,10 +50,11 @@ zig build fmt
 
 ## CI
 
-Two checks run on every PR:
+Three checks run on every PR:
 
 - **fmt** (`.github/workflows/fmt.yml`) — `zig fmt --check` on `build.zig`, `build.zig.zon`, and `src/`.
 - **e2e** (`.github/workflows/e2e.yml`) — builds and runs the Docker `test` target below.
+- **commit-order** (`.github/workflows/commit-order.yml`) — requires each PR's commits to progress documentation → tests → implementation, without an earlier stage appearing after a later one. Bypass it for a PR that doesn't fit the pattern by applying the `skip-commit-order` label.
 
 ### Docker
 
