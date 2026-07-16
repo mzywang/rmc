@@ -7,6 +7,8 @@ const choices = @import("choices.zig");
 
 const App = struct {
     store: store.Store,
+    choices_store: store.Store,
+    next_choice_seq: std.atomic.Value(u64) = .init(0),
     io: std.Io,
 };
 
@@ -22,7 +24,10 @@ pub fn main(init: std.process.Init) !void {
     const app_store = try store.open(allocator, cfg);
     defer app_store.close();
 
-    var app = App{ .store = app_store, .io = init.io };
+    const choices_store = try store.open(allocator, cfg);
+    defer choices_store.close();
+
+    var app = App{ .store = app_store, .choices_store = choices_store, .io = init.io };
 
     var server = try httpz.Server(*App).init(init.io, allocator, .{
         .address = .all(cfg.port),
@@ -36,6 +41,7 @@ pub fn main(init: std.process.Init) !void {
 
     var router = try server.router(.{ .middlewares = &.{request_logger} });
     router.get("/choices", listChoices, .{});
+    router.post("/choices", createChoice, .{});
     router.post("/companies", createCompany, .{});
     router.get("/companies", listCompanies, .{});
 
@@ -64,6 +70,59 @@ fn listChoices(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
 
     res.status = 200;
     try res.json(.{ .choices = page, .next_cursor = next_cursor }, .{});
+}
+
+const CreateChoiceRequest = struct {
+    id: []const u8,
+    selection: []const u8,
+};
+
+fn createChoice(app: *App, req: *httpz.Request, res: *httpz.Response) !void {
+    const parsed = (try req.json(CreateChoiceRequest)) orelse {
+        res.status = 400;
+        try res.json(.{ .@"error" = "missing request body" }, .{});
+        return;
+    };
+
+    const is_option_a = std.mem.eql(u8, parsed.selection, "option_a");
+    const is_option_b = std.mem.eql(u8, parsed.selection, "option_b");
+    if (!is_option_a and !is_option_b) {
+        res.status = 400;
+        try res.json(.{ .@"error" = "selection must be option_a or option_b" }, .{});
+        return;
+    }
+
+    const separator = std.mem.indexOfScalar(u8, parsed.id, ':') orelse {
+        res.status = 404;
+        try res.json(.{ .@"error" = "id does not reference two existing companies" }, .{});
+        return;
+    };
+    const option_a_id = parsed.id[0..separator];
+    const option_b_id = parsed.id[separator + 1 ..];
+
+    const option_a_exists = (try app.store.get(req.arena, option_a_id)) != null;
+    const option_b_exists = (try app.store.get(req.arena, option_b_id)) != null;
+    if (!option_a_exists or !option_b_exists) {
+        res.status = 404;
+        try res.json(.{ .@"error" = "id does not reference two existing companies" }, .{});
+        return;
+    }
+
+    const company_id = if (is_option_a) option_a_id else option_b_id;
+    const created_at = try formatTimestamp(req.arena, app.io);
+
+    const record_json = try std.json.Stringify.valueAlloc(req.arena, .{
+        .id = parsed.id,
+        .selection = parsed.selection,
+        .company_id = company_id,
+        .created_at = created_at,
+    }, .{});
+    const seq = app.next_choice_seq.fetchAdd(1, .monotonic);
+    const record_key = try std.fmt.allocPrint(req.arena, "{d}", .{seq});
+    try app.choices_store.put(record_key, record_json);
+
+    res.status = 201;
+    try res.json(.{ .id = parsed.id, .selection = parsed.selection, .company_id = company_id, .created_at = created_at }, .{});
 }
 
 fn lessThanString(_: void, a: []const u8, b: []const u8) bool {
